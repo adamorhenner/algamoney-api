@@ -1,37 +1,54 @@
 package com.algaworks.algamoneyapi.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 
 @Getter
 @Setter
-
 @Entity
-@Table(name = "pessoa")
-public class Pessoa {
+@Table(name = "lancamento")
+public class Lancamento {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long codigo;
 
-    @NotNull
-    private String nome;
-
-    @Embedded
-    private Endereco endereco;
+    private String descricao;
 
     @NotNull
-    private Boolean ativo;
+    @Column(name = "data_vencimento")
+    @JsonFormat(pattern =  "dd/MM/yyyy")
+    private LocalDate dataVencimento;
 
-    @JsonIgnore
-    @Transient
-    public boolean isInativo() {
-        return !this.ativo;
-    }
+    @Column(name = "data_pagamento")
+    @JsonFormat(pattern =  "dd/MM/yyyy")
+    private LocalDate dataPagamento;
+
+    @NotNull
+    private BigDecimal valor;
+
+    private String observacao;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private TipoLancamento tipo;
+
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "codigo_categoria")
+    private Categoria categoria;
+
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "codigo_pessoa")
+    private Pessoa pessoa;
 
     @Override
     public int hashCode() {
@@ -49,7 +66,7 @@ public class Pessoa {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Pessoa other = (Pessoa) obj;
+        Lancamento other = (Lancamento) obj;
         if (codigo == null) {
             if (other.codigo != null)
                 return false;
@@ -57,5 +74,4 @@ public class Pessoa {
             return false;
         return true;
     }
-
 }
