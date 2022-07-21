@@ -10,9 +10,7 @@ import org.springframework.security.oauth2.config.annotation.configurers.ClientD
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
-import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.token.TokenStore;
-import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
@@ -20,7 +18,6 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 @Configuration
 @EnableAuthorizationServer
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
-
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -34,38 +31,29 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
         clients.inMemory()
                 .withClient("angular")
-                .secret(passwordEncoder.encode("@ngul@r0")) // @ngul@r0
+                .secret("$2a$10$peYOsT.kA48paTszFSeEx.OppvWpfqQgYAjU5UcId4vayKpgFwY22") // @ngul@r0
                 .scopes("read", "write")
-                .authorizedGrantTypes("password","refresh_token")
-                .accessTokenValiditySeconds(20)
-                .refreshTokenValiditySeconds(3600*24)
-                .and()
-                .withClient("mobile")
-                .secret(passwordEncoder.encode("m0b1l30")) // m0b1l30
-                .scopes("read")
-                .authorizedGrantTypes("password")
-                .accessTokenValiditySeconds(1800);
-    }
-
-    @Override
-    public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
-        security.checkTokenAccess("permitAll()");
+                .authorizedGrantTypes("password", "refresh_token")
+                .accessTokenValiditySeconds(1800)
+                .refreshTokenValiditySeconds(3600 * 24);
     }
 
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
         endpoints
                 .authenticationManager(authenticationManager)
+                .userDetailsService(userDetailsService)
                 .accessTokenConverter(accessTokenConverter())
                 .tokenStore(tokenStore())
-                .userDetailsService(userDetailsService)
                 .reuseRefreshTokens(false);
     }
 
     @Bean
     public JwtAccessTokenConverter accessTokenConverter() {
         JwtAccessTokenConverter accessTokenConverter = new JwtAccessTokenConverter();
+
         accessTokenConverter.setSigningKey("3032885ba9cd6621bcc4e7d6b6c35c2b");
+
         return accessTokenConverter;
     }
 
@@ -74,5 +62,5 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
         return new JwtTokenStore(accessTokenConverter());
     }
 
-}
 
+}
