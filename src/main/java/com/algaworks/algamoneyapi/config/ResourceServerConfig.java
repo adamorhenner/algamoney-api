@@ -26,6 +26,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class ResourceServerConfig extends WebSecurityConfigurerAdapter{
 
     @Override
